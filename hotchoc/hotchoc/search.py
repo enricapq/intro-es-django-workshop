@@ -1,11 +1,11 @@
 from elasticsearch_dsl.connections import connections
-from elasticsearch_dsl import DocType, Text, Date
-
+# elasticsearch_dsl 6.2 renamed DocType to Document
+from elasticsearch_dsl import Document, Text, Date, Search
 from elasticsearch.helpers import bulk
 from elasticsearch import Elasticsearch
 from . import models
 
-from elasticsearch_dsl import Document, Text, Date, Search
+connections.create_connection()
 
 def search(suggester):
     s = Search().filter('term', suggester=suggester)
@@ -20,8 +20,6 @@ def bulk_indexing():
     es = Elasticsearch()
     bulk(client=es, actions=(hc.indexing() for hc in models.HotChocStore.objects.all().iterator()))
 
-connections.create_connection()
-
 class HotChocStoreIndex(Document):
     location = Text()
     suggester = Text()
@@ -30,5 +28,10 @@ class HotChocStoreIndex(Document):
     description = Text()
 
     class Meta:
+        index = 'hotchocstore-index'
+        name = 'hotchocstore-index'
+
+    # Workaround https://github.com/elastic/elasticsearch-dsl-py/issues/953
+    class Index:
         index = 'hotchocstore-index'
         name = 'hotchocstore-index'
