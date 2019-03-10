@@ -1,8 +1,8 @@
+from elasticsearch import Elasticsearch
+from elasticsearch.helpers import bulk
 from elasticsearch_dsl.connections import connections
 # elasticsearch_dsl 6.2 renamed DocType to Document
 from elasticsearch_dsl import Document, Text, Date, Search
-from elasticsearch.helpers import bulk
-from elasticsearch import Elasticsearch
 from . import models
 
 connections.create_connection()
@@ -31,7 +31,9 @@ class HotChocStoreIndex(Document):
         index = 'hotchocstore-index'
         name = 'hotchocstore-index'
 
-    # Workaround https://github.com/elastic/elasticsearch-dsl-py/issues/953
+    # Workaround for https://github.com/elastic/elasticsearch-dsl-py/issues/953
+    # elasticsearch-dsl 6.3.1 with elasticsearch 6.3.1
+    # elasticsearch_dsl.exceptions.ValidationException: You cannot write to a wildcard index.
     class Index:
         index = 'hotchocstore-index'
         name = 'hotchocstore-index'
